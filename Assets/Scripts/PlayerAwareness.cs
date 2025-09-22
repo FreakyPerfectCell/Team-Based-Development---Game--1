@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerAwareness : MonoBehaviour
 {
 
+    // AwareOfPlayer indicates whether enemy is aware or not public so other scripts can access
     public bool AwareOfPlayer { get; private set; }
     public Vector2 DirectionToPlayer { get; private set; }
     [SerializeField] private float _playerAwarenessDistance;
@@ -10,11 +11,13 @@ public class PlayerAwareness : MonoBehaviour
 
     private void Awake()
     {
-        _player = FindObjectOfType<Player>().transform;
+        //Searches for gamebjects with scripts of <name>
+        _player = Player.instance.transform;
     }
 
     void Update()
     {
+        // vector2 tells how far the player object is
         Vector2 enemyToPlayerVector = _player.position - transform.position;
         DirectionToPlayer = enemyToPlayerVector.normalized;
 
