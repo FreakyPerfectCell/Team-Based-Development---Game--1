@@ -17,16 +17,20 @@ public class Player : MonoBehaviour
     public Transform Aim;
     bool isWalking = false;
 
+    [Header("UI Crap")]
     public int currentHealth;
     public int maxHealth;
     public GameObject deadScreen;
     private bool hasDied;
     public TextMeshProUGUI healthText;
+    // makes it so we can use instance
     public static Player instance;
 
+    // instance so we can use this with other scripts
     private void Awake()
     {
         instance = this;
+        // instance this means this script
         rb = GetComponent<Rigidbody2D>();
     }
 

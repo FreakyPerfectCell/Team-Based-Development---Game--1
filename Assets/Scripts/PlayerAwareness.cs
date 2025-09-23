@@ -11,7 +11,7 @@ public class PlayerAwareness : MonoBehaviour
 
     private void Awake()
     {
-        //Searches for gamebjects with scripts of <name>
+        // searches for gamebjects with scripts of <name>
         _player = Player.instance.transform;
     }
 

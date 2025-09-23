@@ -15,3 +15,6 @@ public class Bullet : MonoBehaviour
         }
     }
 }
+
+// when we collide with a object with tag "Enemy" we call TakeDamage() | see enemy script for more
+// after collision we destroy the bullet object
