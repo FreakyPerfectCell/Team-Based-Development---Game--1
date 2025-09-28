@@ -7,6 +7,8 @@ public class Enemy : MonoBehaviour
     // instance this means this script
     public static Enemy instance;
     public PoisonSmoke poisonSmoke;
+    private Vector3Int lastTilePos;
+    private bool firstCheck = true;
 
     [Header("Health Crap")]
     [SerializeField] public int currentHealth;
@@ -79,6 +81,20 @@ public class Enemy : MonoBehaviour
 
     void CheckTile()
     {
-        poisonSmoke.TriggerPoisonSpread(transform.position);
+        if (poisonSmoke == null || poisonSmoke.poisonTilemap == null)
+            return;
+
+        // Convert enemy world position to tile cell
+        Vector3Int currentTile = poisonSmoke.poisonTilemap.WorldToCell(transform.position);
+
+        // On first check OR tile has changed
+        if (firstCheck || currentTile != lastTilePos)
+        {
+            lastTilePos = currentTile;
+            firstCheck = false;
+
+            // Only trigger when tile changes
+            poisonSmoke.TriggerPoisonSpread(transform.position);
+        }
     }
 }

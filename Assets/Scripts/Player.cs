@@ -42,6 +42,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        CheckPoisonTile();
         //HandleAnimations();
     }
 
@@ -133,5 +134,15 @@ public class Player : MonoBehaviour
         }
 
         healthText.text = currentHealth.ToString();
+    }
+
+    void CheckPoisonTile()
+    {
+        GameObject poisonTilemapGO = GameObject.FindGameObjectWithTag("PoisonSpreadable");
+        if (poisonTilemapGO != null)
+        {
+            var manager = poisonTilemapGO.GetComponent<PoisonSmoke>();
+            manager.OnPlayerStepped(transform.position, gameObject);
+        }
     }
 }

@@ -28,12 +28,15 @@ public class PoisonSmoke : MonoBehaviour
     public void TriggerPoisonSpread(Vector3 worldPos)
     {
         Vector3Int cell = poisonTilemap.WorldToCell(worldPos);
+        int currentLevel = GetPoisonLevel(cell);
 
-        if (!spreadingTiles.Contains(cell))
-        {
-            spreadingTiles.Add(cell);
-            StartCoroutine(SpreadFrom(cell));
-        }
+        // Don't go above max level
+        if (currentLevel >= maxLevel)
+            return;
+
+        int newLevel = Mathf.Clamp(currentLevel + 1, 1, maxLevel);
+        SetPoisonLevel(cell, newLevel);
+        Debug.Log($"Poison level set to {newLevel} at tile {cell}");
     }
 
     private IEnumerator SpreadFrom(Vector3Int origin)
