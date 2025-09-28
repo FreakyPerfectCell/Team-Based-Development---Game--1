@@ -5,21 +5,29 @@ using UnityEngine.AI;
 
 public class EnemyPathFinding : MonoBehaviour
 {
-    public Transform target;             // Assign the player in Inspector
-    public float tileSize = 1f;          // Size of one tile
-    public float moveSpeed = 5f;         // Speed of movement
-    public float moveDelay = 0.2f;       // Time between tile moves
-    public LayerMask obstacleLayer;      // What counts as a wall/obstacle
+    public Transform pointA;               // First patrol point
+    public Transform pointB;               // Second patrol point
+    public float tileSize = 1f;            // Size of one tile
+    public float moveSpeed = 5f;           // Speed of movement
+    public float moveDelay = 0.2f;         // Time between tile moves
+    public LayerMask obstacleLayer;        // Obstacles to avoid
 
     private bool isMoving = false;
+    private Transform currentTarget;
+
+    void Start()
+    {
+        currentTarget = pointB; // Start by moving toward pointB
+    }
 
     void Update()
     {
-        if (isMoving || target == null) return;
+        if (isMoving || currentTarget == null) return;
 
-        Vector2 delta = target.position - transform.position;
+        Vector2 delta = currentTarget.position - transform.position;
         Vector2Int primaryDir = Vector2Int.zero;
 
+        // Determine primary direction (horizontal or vertical)
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
         {
             primaryDir = new Vector2Int((int)Mathf.Sign(delta.x), 0);
@@ -29,12 +37,14 @@ public class EnemyPathFinding : MonoBehaviour
             primaryDir = new Vector2Int(0, (int)Mathf.Sign(delta.y));
         }
 
+        // Try moving in primary direction
         if (primaryDir != Vector2Int.zero && CanMove(primaryDir))
         {
             StartCoroutine(MoveTo(transform.position + (Vector3)((Vector2)primaryDir * tileSize)));
             return;
         }
 
+        // Try moving in secondary direction
         Vector2Int secondaryDir = (primaryDir.x != 0)
             ? new Vector2Int(0, (int)Mathf.Sign(delta.y))
             : new Vector2Int((int)Mathf.Sign(delta.x), 0);
@@ -45,6 +55,7 @@ public class EnemyPathFinding : MonoBehaviour
             return;
         }
 
+        // Fallback: move in a random valid direction
         Vector2Int randomDir = GetRandomValidDirection();
         if (randomDir != Vector2Int.zero)
         {
@@ -95,6 +106,13 @@ public class EnemyPathFinding : MonoBehaviour
         }
 
         transform.position = destination;
+
+        // Switch to the other point if we've arrived at the current one
+        if (Vector2.Distance(transform.position, currentTarget.position) < 0.1f)
+        {
+            currentTarget = (currentTarget == pointA) ? pointB : pointA;
+        }
+
         yield return new WaitForSeconds(moveDelay);
         isMoving = false;
     }

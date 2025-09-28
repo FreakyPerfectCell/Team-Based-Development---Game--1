@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
     // makes it so we can use instance
     // instance this means this script
     public static Enemy instance;
+    public PoisonSmoke poisonSmoke;
 
     [Header("Health Crap")]
     [SerializeField] public int currentHealth;
@@ -22,12 +23,18 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
+        instance = this;
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Start()
     {
         currentHealth = maxHealth;
+    }
+
+    void Update()
+    {
+        CheckTile();
     }
 
     // damages player on collision
@@ -68,5 +75,10 @@ public class Enemy : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    void CheckTile()
+    {
+        poisonSmoke.TriggerPoisonSpread(transform.position);
     }
 }
