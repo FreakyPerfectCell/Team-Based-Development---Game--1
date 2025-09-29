@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - PoisonSpreadable
+  - Dam
   layers:
   - Default
   - TransparentFX

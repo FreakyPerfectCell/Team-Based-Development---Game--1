@@ -47,6 +47,11 @@ public class Enemy : MonoBehaviour
         {
             Player.instance.TakeDamage(damageAmount);
         }
+
+        if (collision.GetComponent<DamManager>())
+        {
+            DamManager.instance.TakeDamage(damageAmount);
+        }
     }
 
     // takes regular shot damage 

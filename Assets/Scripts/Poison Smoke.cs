@@ -14,6 +14,9 @@ public class PoisonSmoke : MonoBehaviour
     public float spreadDelay = 0.2f;
     public int spreadRadius = 1;
     public int[] damagePerLevel = new int[6];
+    public float damaCooldown = 2f;
+    
+    private float damaTimer = 0f;
 
     private Dictionary<Vector3Int, int> poisonLevels = new Dictionary<Vector3Int, int>();
     private HashSet<Vector3Int> spreadingTiles = new HashSet<Vector3Int>();
@@ -80,6 +83,31 @@ public class PoisonSmoke : MonoBehaviour
         return poisonLevels.TryGetValue(pos, out int level) ? level : 0;
     }
 
+    public int GetTotalPoisonLevel(GameObject player)
+    {
+        int total = 0;
+
+        foreach (int level in poisonLevels.Values)
+        {
+            total += level;
+        }
+
+        if (total >= 20)
+        {
+            damaTimer += Time.deltaTime;
+            if (damaTimer >= damaCooldown)
+            {
+                player.GetComponent<Player>()?.TakeDamage(1);
+                damaTimer = 0f;
+            }
+        }
+        else
+        {
+            damaTimer = 0f;
+        }
+        return total;
+    }
+
     private void UpdateTileVisual(Vector3Int pos, int level)
     {
         if (level <= 0)
@@ -92,8 +120,9 @@ public class PoisonSmoke : MonoBehaviour
         }
     }
 
-    public void OnPlayerStepped(Vector3 worldPos, GameObject player)
+    public void OnPlayerStepped(Vector3 worldPos, GameObject player, GameObject dam)
     {
+        GetTotalPoisonLevel(player);
         Vector3Int cell = poisonTilemap.WorldToCell(worldPos);
         int level = GetPoisonLevel(cell);
 
@@ -101,7 +130,40 @@ public class PoisonSmoke : MonoBehaviour
         {
             int damage = damagePerLevel[level];
             Debug.Log($"Player took {damage} poison damage at tile {cell}");
-            player.GetComponent<Player>()?.TakeDamage(damage);
+            damaTimer += Time.deltaTime;
+
+            // creates a cooldown with damage times | prevents instant death
+            if (damaTimer >= damaCooldown)
+            {
+                dam.GetComponent<DamManager>()?.TakeDamage(damage);
+                player.GetComponent<Player>()?.TakeDamage(damage);
+                damaTimer = 0f;
+            }                
+        }
+
+        if (level == 1)
+        {
+            player.GetComponent<Player>()?.SlowMove1();
+        }
+        else if (level == 2)
+        {
+            player.GetComponent<Player>()?.SlowMove2();
+        }
+        else if (level == 3)
+        {
+            player.GetComponent<Player>()?.SlowMove3();
+        }
+        else if (level == 4)
+        {
+            player.GetComponent<Player>()?.SlowMove4();
+        }
+        else if (level == 5)
+        {
+            player.GetComponent<Player>()?.SlowMove5();
+        }
+        else if (level == 0)
+        {
+            player.GetComponent<Player>()?.SlowMove0();
         }
     }
 }

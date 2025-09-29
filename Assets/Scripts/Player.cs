@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
 
     public float moveSpeed = 5f;
+    public float maxSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Vector2 moveDirection;
@@ -36,6 +37,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        moveSpeed = maxSpeed;
         currentHealth = maxHealth;
         healthText.text = currentHealth.ToString();
     }
@@ -62,9 +64,7 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         rb.linearVelocity = moveDirection * moveSpeed;         
-
         if(!hasDied)
         {
             if (isWalking)
@@ -136,13 +136,48 @@ public class Player : MonoBehaviour
         healthText.text = currentHealth.ToString();
     }
 
+
+
     void CheckPoisonTile()
     {
         GameObject poisonTilemapGO = GameObject.FindGameObjectWithTag("PoisonSpreadable");
         if (poisonTilemapGO != null)
         {
             var manager = poisonTilemapGO.GetComponent<PoisonSmoke>();
-            manager.OnPlayerStepped(transform.position, gameObject);
+            manager.OnPlayerStepped(transform.position, gameObject, gameObject);
         }
+    }
+
+    // maunally sets the speed down 10% per level
+    // easier and prevents the speed from going down to 0
+    // plus it works
+    public void SlowMove1()
+    {
+        moveSpeed = 4.9f;
+    }
+
+    public void SlowMove2()
+    {
+        moveSpeed = 4.8f;
+    }
+
+    public void SlowMove3()
+    {
+        moveSpeed = 4.7f;
+    }
+
+    public void SlowMove4()
+    {
+        moveSpeed = 4.6f;
+    }
+
+    public void SlowMove5()
+    {
+        moveSpeed = 4.5f;
+    }
+
+    public void SlowMove0()
+    {
+        moveSpeed = maxSpeed;
     }
 }

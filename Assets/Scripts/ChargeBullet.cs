@@ -11,10 +11,10 @@ public class ChargeBullet : MonoBehaviour
 			{
 				enemy.TakeCharge();
 			}
-			Destroy(gameObject);
 		}
 	}
 }
 
 // when we collide with a object with tag "Enemy" we call TakeCharge() | see enemy script for more
 // after collision we destroy the bullet object
+// no destroy makes it a piercing shot
