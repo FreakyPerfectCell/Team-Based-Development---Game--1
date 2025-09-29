@@ -69,6 +69,7 @@ public class Player : MonoBehaviour
         {
             if (isWalking)
                 {
+                    //
                     Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
                     Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
                 }
@@ -88,6 +89,7 @@ public class Player : MonoBehaviour
         }
         else if (input.y < -0.01f)
         {
+            //
             lastDirection = "Down";
             finalDirection = new Vector2(0, -1);
             isWalking = true;
@@ -119,6 +121,7 @@ public class Player : MonoBehaviour
 
     private void OnMove(InputValue value)
     {   
+        //
         moveInput = value.Get<Vector2>().normalized;
         moveDirection = GetDirection(moveInput);
     }
@@ -143,6 +146,7 @@ public class Player : MonoBehaviour
         GameObject poisonTilemapGO = GameObject.FindGameObjectWithTag("PoisonSpreadable");
         if (poisonTilemapGO != null)
         {
+            //
             var manager = poisonTilemapGO.GetComponent<PoisonSmoke>();
             manager.OnPlayerStepped(transform.position, gameObject, gameObject);
         }
