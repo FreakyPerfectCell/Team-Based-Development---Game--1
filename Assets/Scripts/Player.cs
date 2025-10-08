@@ -62,6 +62,13 @@ public class Player : MonoBehaviour
         //anim.play(animationName + lastDirection);
     //}
 
+    // this is gonna be alot for HandleAnimations()
+    //
+    //
+    //
+    //
+    //
+
     private void FixedUpdate()
     {
         rb.linearVelocity = moveDirection * moveSpeed;         
@@ -69,7 +76,7 @@ public class Player : MonoBehaviour
         {
             if (isWalking)
                 {
-                    //
+                    //rotates the aim transform
                     Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
                     Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
                 }
@@ -78,6 +85,12 @@ public class Player : MonoBehaviour
 
     private Vector3 GetDirection(Vector3 input)
     {
+        //one for each direction
+        //needed for specifically 4 way movement
+        //lastDirection used for the animations
+        //vectors to update move the aim
+        //finalDirection is like the current direction also for animations
+
         Vector3 finalDirection = Vector3.zero;
         if (input.y > 0.01f)
         {
@@ -89,7 +102,6 @@ public class Player : MonoBehaviour
         }
         else if (input.y < -0.01f)
         {
-            //
             lastDirection = "Down";
             finalDirection = new Vector2(0, -1);
             isWalking = true;
@@ -121,7 +133,7 @@ public class Player : MonoBehaviour
 
     private void OnMove(InputValue value)
     {   
-        //
+        //checks which direction you press and gets the direction for the other parts of the code
         moveInput = value.Get<Vector2>().normalized;
         moveDirection = GetDirection(moveInput);
     }
@@ -146,7 +158,7 @@ public class Player : MonoBehaviour
         GameObject poisonTilemapGO = GameObject.FindGameObjectWithTag("PoisonSpreadable");
         if (poisonTilemapGO != null)
         {
-            //
+            //checks with PoisonSmoke and checks the tile the player is standing on
             var manager = poisonTilemapGO.GetComponent<PoisonSmoke>();
             manager.OnPlayerStepped(transform.position, gameObject, gameObject);
         }
@@ -157,31 +169,37 @@ public class Player : MonoBehaviour
     // plus it works
     public void SlowMove1()
     {
-        moveSpeed = 4.9f;
+        // 10%
+        moveSpeed = 4.5f;
     }
 
     public void SlowMove2()
     {
-        moveSpeed = 4.8f;
+        // 20%
+        moveSpeed = 4.0f;
     }
 
     public void SlowMove3()
     {
-        moveSpeed = 4.7f;
+        // 30%
+        moveSpeed = 3.5f;
     }
 
     public void SlowMove4()
     {
-        moveSpeed = 4.6f;
+        // 40%
+        moveSpeed = 3.0f;
     }
 
     public void SlowMove5()
     {
-        moveSpeed = 4.5f;
+        // 50%
+        moveSpeed = 2.5f;
     }
 
     public void SlowMove0()
     {
+        // 0%
         moveSpeed = maxSpeed;
     }
 }

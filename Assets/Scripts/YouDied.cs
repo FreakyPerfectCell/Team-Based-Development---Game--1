@@ -15,7 +15,7 @@ public class YouDied : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R)) // placeholder R (this is reused code, you can change it to whatever you want just make sure you update the UI if you do so)
         {
             ResetScene();
         }
