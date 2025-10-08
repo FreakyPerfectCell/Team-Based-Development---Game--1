@@ -31,3 +31,6 @@ public class PlayerAwareness : MonoBehaviour
         }
     }
 }
+
+// you know, with enemy pathfinding i dont think we need this script anymore
+// leave this here till the very last second just incase

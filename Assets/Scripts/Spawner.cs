@@ -26,4 +26,6 @@ public class Spawner : MonoBehaviour
         {
             _timeUntilSpawn = Random.Range(_minimumSpawnTime, _maximumSpawnTime);
         }
+
+        // didnt test yet but this should hypothectically work
 }

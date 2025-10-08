@@ -7,15 +7,17 @@ public class PoisonSmoke : MonoBehaviour
 {
     [Header("Tilemap Setup")]
     public Tilemap poisonTilemap;
-    public TileBase[] poisonTiles = new TileBase[6]; // Tiles for poison levels 0–5
+    public TileBase[] poisonTiles = new TileBase[6]; // tiles for poison levels 0–5
 
     [Header("Poison Settings")]
     public int maxLevel = 5;
     public float spreadDelay = 0.2f;
     public int spreadRadius = 1;
     public int[] damagePerLevel = new int[6];
+    // damage cooldown
     public float damaCooldown = 2f;
     
+    // damage timer
     private float damaTimer = 0f;
 
     private Dictionary<Vector3Int, int> poisonLevels = new Dictionary<Vector3Int, int>();
@@ -23,17 +25,18 @@ public class PoisonSmoke : MonoBehaviour
 
     private void Awake()
     {
+        // gets ground tilemap ready for the picking
         if (poisonTilemap == null)
             poisonTilemap = GetComponent<Tilemap>();
     }
 
-    // Called by external trigger, like an enemy stepping on a tile
+    // called by external trigger, like an enemy stepping on a tile
     public void TriggerPoisonSpread(Vector3 worldPos)
     {
         Vector3Int cell = poisonTilemap.WorldToCell(worldPos);
         int currentLevel = GetPoisonLevel(cell);
 
-        // Don't go above max level
+        // wont go above max level
         if (currentLevel >= maxLevel)
             return;
 
@@ -55,7 +58,7 @@ public class PoisonSmoke : MonoBehaviour
                 Vector3Int pos = new Vector3Int(origin.x + dx, origin.y + dy, origin.z);
                 if (pos == origin) continue;
 
-                // Only spread to valid tiles (matching tag)
+                // only spread to valid tiles (matching tag)
                 if (CanSpreadTo(pos))
                 {
                     int newLevel = Mathf.Clamp(originLevel - 1, 1, maxLevel);
@@ -67,19 +70,21 @@ public class PoisonSmoke : MonoBehaviour
 
     private bool CanSpreadTo(Vector3Int pos)
     {
-        // Only spread to positions within the tilemap with no poison or lower level
+        // only spread to positions within the tilemap with no poison or lower level
         int currentLevel = GetPoisonLevel(pos);
         return currentLevel < 1;
     }
 
     public void SetPoisonLevel(Vector3Int pos, int level)
     {
+        // sets the poison level and calls the function to update the tile
         poisonLevels[pos] = level;
         UpdateTileVisual(pos, level);
     }
 
     public int GetPoisonLevel(Vector3Int pos)
     {
+        // returns the poison level for total sum function 
         return poisonLevels.TryGetValue(pos, out int level) ? level : 0;
     }
 
@@ -112,11 +117,11 @@ public class PoisonSmoke : MonoBehaviour
     {
         if (level <= 0)
         {
-            poisonTilemap.SetTile(pos, null); // Clear tile
+            poisonTilemap.SetTile(pos, null); // clear tile
         }
         else if (level >= 0 && level < poisonTiles.Length)
         {
-            poisonTilemap.SetTile(pos, poisonTiles[level]);
+            poisonTilemap.SetTile(pos, poisonTiles[level]); // checks tile level
         }
     }
 
@@ -132,7 +137,7 @@ public class PoisonSmoke : MonoBehaviour
             Debug.Log($"Player took {damage} poison damage at tile {cell}");
             damaTimer += Time.deltaTime;
 
-            // creates a cooldown with damage times | prevents instant death
+            // creates a cooldown with damage times, prevents damage every 0.01 second basically instant death
             if (damaTimer >= damaCooldown)
             {
                 dam.GetComponent<DamManager>()?.TakeDamage(damage);
@@ -140,6 +145,8 @@ public class PoisonSmoke : MonoBehaviour
                 damaTimer = 0f;
             }                
         }
+
+        // after checking we call these funstions in player script
 
         if (level == 1)
         {
