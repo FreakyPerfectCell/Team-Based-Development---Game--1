@@ -39,6 +39,12 @@ public class Enemy : MonoBehaviour
         CheckTile();
     }
 
+    public void Initialize(PoisonSmoke poisonSmokeRef, Transform playerRef)
+    {
+        poisonSmoke = poisonSmokeRef;
+        player = playerRef;
+    }
+
     // damages player on collision
     // instance calls player script and takes does damageAmount - playerHealth
     private void OnTriggerEnter2D(Collider2D collision)
@@ -66,6 +72,7 @@ public class Enemy : MonoBehaviour
         if (currentHealth <= 0)
         {
             Destroy(gameObject);
+            GameManager.Instance.AddScore(10);
         }
     }
 
@@ -81,6 +88,7 @@ public class Enemy : MonoBehaviour
         if (currentHealth <= 0)
         {
             Destroy(gameObject);
+            GameManager.Instance.AddScore(10);
         }
     }
 

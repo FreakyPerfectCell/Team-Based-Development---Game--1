@@ -45,29 +45,30 @@ public class Player : MonoBehaviour
     private void Update()
     {
         CheckPoisonTile();
-        //HandleAnimations();
+        HandleAnimations();
     }
 
-    //private void HandleAnimations()
-    //{
-        //if (anim == null) return;
+    private void HandleAnimations()
+    {
+        if (anim == null) return;
 
-        //string animationName = "";
+        string animationName = "";
 
-        //if (moveDirection == Vector2.zero)
-            //animationName = "Idle";
-        //else
-            //animationName = "Walking";
+        if (moveDirection == Vector2.zero)
+            animationName = "Idle";
+        else
+            animationName = "Walking";
 
-        //anim.play(animationName + lastDirection);
-    //}
+        anim.Play(animationName + lastDirection);
+    }
 
     // this is gonna be alot for HandleAnimations()
-    //
-    //
-    //
-    //
-    //
+    // if we arent moving we play an idle anim for whatever the lastDirection was pressed
+    // if we went up last then we play IdleUp
+    // we dont play each individual animation, its always gonna check for the idle and if were not idle
+    // we will set animationName to walking then pair it with the lastDirection
+    // it seems confusing but look at it again its fairly simple
+    // just make sure that the animation clips themselves are named like "WalkingRight" or "IdleUp"
 
     private void FixedUpdate()
     {

@@ -5,19 +5,26 @@ using UnityEngine.AI;
 
 public class EnemyPathFinding : MonoBehaviour
 {
-    public Transform pointA;               // First patrol point
-    public Transform pointB;               // Second patrol point
+    public List<Transform> pathPoints = new List<Transform>();    // Gets the checkpoints to move
     public float tileSize = 1f;            // Size of one tile
     public float moveSpeed = 5f;           // Speed of movement
     public float moveDelay = 0.2f;         // Time between tile moves
-    public LayerMask obstacleLayer;        // Obstacles to avoid
+    public LayerMask obstacleLayer;        // Border layer to avoid
+    public LayerMask obstacleDam;          // Dam layer to avoid
 
     private bool isMoving = false;
+    private int currentTargetIndex = 0;
     private Transform currentTarget;
 
     void Start()
     {
-        currentTarget = pointB; // Start by moving toward pointB
+        if (pathPoints == null || pathPoints.Count == 0)
+        {
+            enabled = false;
+            return;
+        }
+
+        currentTarget = pathPoints[currentTargetIndex];
     }
 
     void Update()
@@ -67,6 +74,7 @@ public class EnemyPathFinding : MonoBehaviour
     {
         Vector2 checkPos = (Vector2)transform.position + dir * tileSize;
         return !Physics2D.OverlapCircle(checkPos, 0.1f, obstacleLayer);
+        return !Physics2D.OverlapCircle(checkPos, 0.1f, obstacleDam);
     }
 
     Vector2Int GetRandomValidDirection()
@@ -107,10 +115,15 @@ public class EnemyPathFinding : MonoBehaviour
 
         transform.position = destination;
 
-        // Switch to the other point if we've arrived at the current one
+        // Switch to the next point if we've arrived at the current one
         if (Vector2.Distance(transform.position, currentTarget.position) < 0.1f)
         {
-            currentTarget = (currentTarget == pointA) ? pointB : pointA;
+            currentTargetIndex = (currentTargetIndex + 1) % pathPoints.Count;
+            currentTarget = pathPoints[currentTargetIndex];
+            if (currentTargetIndex > 4)
+            {
+                currentTargetIndex = 0;
+            }
         }
 
         yield return new WaitForSeconds(moveDelay);

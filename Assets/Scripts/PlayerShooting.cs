@@ -21,33 +21,55 @@ public class PlayerShooting : MonoBehaviour
     public float minChargeTime = 0.4f;
     public float ChargeTime = 0f;
 
+    private float spacePressedTime = 0f;
     public float spacePressed = 0f;
+    // how fast the second press must be to work
+    [SerializeField] private float tapMaxDelay = 0.3f;
 
     void Update()
     {
        shootTimer += Time.deltaTime;
 
        // if shoot is pressed it'll call the shoot function
-       if(Input.GetKeyDown(KeyCode.Return))
+       if(Input.GetKeyDown(KeyCode.Space))
        {
            OnShoot();
        }
 
        // holding shoot starts the timer of charge
-       if(Input.GetKey(KeyCode.Return))
+       if(Input.GetKey(KeyCode.Space))
        {
            ChargeTime += Time.deltaTime;
        }
 
        // letting go of shoot calls the charge shot funciton
-       if(Input.GetKeyUp(KeyCode.Return))
+       if(Input.GetKeyUp(KeyCode.Space))
        {
            OnChargeShoot();
        }
 
-       if(Input.GetKeyDown(KeyCode.Space))
+       if(Input.GetKeyDown(KeyCode.LeftShift))
        {
-           Dam();
+           if (spacePressed == 0)
+           {
+               spacePressed = 1;
+               spacePressedTime = Time.deltaTime;
+           }
+           else if (spacePressed == 1 && spacePressedTime <= tapMaxDelay)
+           {
+               Dam();
+               spacePressed = 0;
+           }
+           else
+           {
+               spacePressed =  0;
+               spacePressedTime = Time.deltaTime;
+           }
+
+           if (spacePressedTime == 1 && Time.deltaTime > tapMaxDelay)
+           {
+               spacePressed = 0;
+           }
        }
     }
 

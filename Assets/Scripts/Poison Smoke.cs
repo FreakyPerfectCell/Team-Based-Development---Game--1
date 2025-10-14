@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
 
 public class PoisonSmoke : MonoBehaviour
 {
@@ -16,9 +18,12 @@ public class PoisonSmoke : MonoBehaviour
     public int[] damagePerLevel = new int[6];
     // damage cooldown
     public float damaCooldown = 2f;
+    public TextMeshProUGUI totalText;
     
     // damage timer
     private float damaTimer = 0f;
+
+    public float spreadInterval = 5f;
 
     private Dictionary<Vector3Int, int> poisonLevels = new Dictionary<Vector3Int, int>();
     private HashSet<Vector3Int> spreadingTiles = new HashSet<Vector3Int>();
@@ -28,6 +33,13 @@ public class PoisonSmoke : MonoBehaviour
         // gets ground tilemap ready for the picking
         if (poisonTilemap == null)
             poisonTilemap = GetComponent<Tilemap>();
+
+        StartCoroutine(GrowPoisonOverTime());
+    }
+
+    private void Start()
+    {
+        StartCoroutine(SpreadPoisonContinuously());
     }
 
     // called by external trigger, like an enemy stepping on a tile
@@ -45,23 +57,60 @@ public class PoisonSmoke : MonoBehaviour
         Debug.Log($"Poison level set to {newLevel} at tile {cell}");
     }
 
-    private IEnumerator SpreadFrom(Vector3Int origin)
+    private IEnumerator SpreadPoisonContinuously()
     {
-        int originLevel = GetPoisonLevel(origin);
-
-        yield return new WaitForSeconds(spreadDelay);
-
-        for (int dx = -spreadRadius; dx <= spreadRadius; dx++)
+        while (true)
         {
-            for (int dy = -spreadRadius; dy <= spreadRadius; dy++)
-            {
-                Vector3Int pos = new Vector3Int(origin.x + dx, origin.y + dy, origin.z);
-                if (pos == origin) continue;
+            yield return new WaitForSeconds(spreadInterval);
+            // makes a copy of the poison tile to spread
+            List<Vector3Int> tilesToSpread = new List<Vector3Int>(poisonLevels.Keys);
 
-                // only spread to valid tiles (matching tag)
-                if (CanSpreadTo(pos))
+            foreach (Vector3Int origin in tilesToSpread)
+            {
+                int originLevel = GetPoisonLevel(origin);
+                if (originLevel <= 0) continue;
+
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    int newLevel = Mathf.Clamp(originLevel - 1, 1, maxLevel);
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        Vector3Int target = new Vector3Int(origin.x + dx, origin.y + dy, origin.z);
+                        if (target == origin) continue;
+
+                        Vector3 worldPos = poisonTilemap.CellToWorld(target) + poisonTilemap.cellSize / 2f;
+                        Collider2D hit = Physics2D.OverlapPoint(worldPos);
+
+                        if (hit != null && hit.CompareTag("PoisonSpreadable"))
+                        {
+                            int targetLevel = GetPoisonLevel(target);
+
+                            if (targetLevel == 0)
+                            {
+                                SetPoisonLevel(target, originLevel);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private IEnumerator GrowPoisonOverTime()
+    {
+        while (true)
+        {
+            // timer for the smoke to evolve
+            // basically every (Xf) seconds whatever tiles are on the screen increase level by 1
+            yield return new WaitForSeconds(5f);
+
+            List<Vector3Int> keys = new List<Vector3Int>(poisonLevels.Keys);
+            foreach (Vector3Int pos in keys)
+            {
+                int currentLevel = poisonLevels[pos];
+                // || means or
+                if (currentLevel == 1 || currentLevel == 2 || currentLevel == 3 || currentLevel == 4)
+                {
+                    int newLevel = Mathf.Clamp(currentLevel + 1, 1, maxLevel);
                     SetPoisonLevel(pos, newLevel);
                 }
             }
@@ -95,9 +144,11 @@ public class PoisonSmoke : MonoBehaviour
         foreach (int level in poisonLevels.Values)
         {
             total += level;
+            totalText.text = total.ToString();
         }
 
-        if (total >= 20)
+        // set the total for levels
+        if (total >= 100)
         {
             damaTimer += Time.deltaTime;
             if (damaTimer >= damaCooldown)
@@ -141,7 +192,6 @@ public class PoisonSmoke : MonoBehaviour
             if (damaTimer >= damaCooldown)
             {
                 dam.GetComponent<DamManager>()?.TakeDamage(damage);
-                player.GetComponent<Player>()?.TakeDamage(damage);
                 damaTimer = 0f;
             }                
         }
