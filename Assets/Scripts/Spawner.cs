@@ -7,7 +7,7 @@ public class Spawner : MonoBehaviour
         [SerializeField] private PoisonSmoke _poisonSmoke;
         [SerializeField] private float _minimumSpawnTime;
         [SerializeField] private float _maximumSpawnTime;
-        //[SerializeField] private int _maxSpawns = 5;
+        [SerializeField] private int _maxSpawns = 2;
 
         private float _timeUntilSpawn;
         private int _spawnCount = 0;
